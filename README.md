@@ -15,3 +15,6 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 PORT=3000
 OPENAI_API_KEY="blah"
 ```
+
+## Add pdf
+to use pdf analyzer, add pdf in the root folder
