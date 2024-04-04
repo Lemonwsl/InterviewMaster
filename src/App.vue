@@ -99,6 +99,7 @@ export default {
 
 
 <style scoped>
+
 .chat-container {
   height: 80vh;
   overflow-y: auto;
@@ -131,6 +132,7 @@ export default {
 }
 
 .chat-width-modifier {
+  box-shadow: 0 0px 48px rgba(0, 0, 0, 0.2);
   max-width: 960px;
 }
 </style>
