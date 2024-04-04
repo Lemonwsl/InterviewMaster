@@ -18,6 +18,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "material-design-icons-iconfont": "^6.7.0",
+    "modelfusion": "^0.137.0",
+    "pdfjs-dist": "^4.0.379",
     "vue": "^3.4.21",
     "vuetify": "^3.4.0-beta.1"
   },

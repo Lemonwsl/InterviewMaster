@@ -10,8 +10,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 import reply from "./interview.js";
+import pdfanalyze from "./pdfanalyzer.js";
 
 app.post("/api/chat", reply);
+
+app.post("/api/pdf", pdfanalyze);
 
 app.listen(port, () => {
   console.log("Server listening on port", port);

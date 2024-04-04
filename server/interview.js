@@ -8,7 +8,7 @@ const openai = new OpenAI({
 
 async function reply(req, res) {
   let trigger = [
-      {"role": "system", "content": "You are an interviewer and expert in a big company"},
+      {"role": "system", "content": "You are an interviewer and expert in a big company. Your job is only to ask one great question each time"},
       {"role": "user", "content": req.body.message},
   ];
 
