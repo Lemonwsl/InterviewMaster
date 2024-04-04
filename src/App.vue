@@ -5,7 +5,7 @@
         <v-row>
           <v-col cols="12">
             <v-card class="pa-3 mx-auto chat-width-modifier">
-              <v-card-title class="text-h5">Ai interviewer</v-card-title>
+              <v-card-title class="text-h4">Ai interviewer</v-card-title>
               <v-card-text class="chat-container" ref="chatContainer">
                 <div class="messages" ref="messagesContainer">
                   <div v-for="msg in messages" :key="msg.id" :class="{'message-user': msg.sender === 'user', 'message-bot': msg.sender === 'bot'}">
@@ -101,7 +101,7 @@ export default {
 <style scoped>
 
 .chat-container {
-  height: 80vh;
+  height: 77.5vh;
   overflow-y: auto;
 }
 .messages {
@@ -109,17 +109,21 @@ export default {
   flex-direction: column;
 }
 .message-user {
+  font-size: 0.9rem;
+  border-radius: 6px;
   align-self: flex-end;
-  background-color: #f0f0f0;
+  background-color: #dbdbdb;
 }
 .message-bot {
+  font-size: 0.9rem;
+  border-radius: 6px;
   align-self: flex-start;
-  background-color: #e0e0e0;
+  background-color: #d1d1d1;
 }
 .message-content {
   margin: 5px;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 12;
 }
 .v-container {
   position: fixed;
@@ -135,4 +139,12 @@ export default {
   box-shadow: 0 0px 48px rgba(0, 0, 0, 0.2);
   max-width: 960px;
 }
+
+/* bigger screen use bigger font */
+@media (min-width: 600px) {
+  .message-user, .message-bot {
+    font-size: 1.2rem;
+  }
+}
+
 </style>
