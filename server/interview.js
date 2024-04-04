@@ -22,4 +22,25 @@ async function reply(req, res) {
   res.json({ "reply": res_obj.choices[0].message.content});
 }
 
-export default reply;
+async function feedback(req, res) {
+  let system_trigger = "You are an interviewer and expert in a big company. "
+                  + "You are a strict and direct person as well. "
+                    + "Your job is to analyze and give feedback of given answer from the "
+                      + "question: " + req.body.question;
+  let user_trigger = "Give me feedback if I answer it like this: " + req.body.answer
+  let trigger = [
+      {"role": "system", "content": system_trigger},
+      {"role": "user", "content": user_trigger},
+  ];
+
+  const params = {
+    messages: trigger,
+    model: 'gpt-4',
+    max_tokens: 100,
+  };
+
+  let res_obj = await openai.chat.completions.create(params);
+  res.json({ "reply": res_obj.choices[0].message.content});
+}
+
+export {reply, feedback};

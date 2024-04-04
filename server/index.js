@@ -9,10 +9,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import reply from "./interview.js";
+import { reply, feedback } from "./interview.js";
 import pdfanalyze from "./pdfanalyzer.js";
 
 app.post("/api/chat", reply);
+app.post("/api/feedback", feedback);
 
 app.post("/api/pdf", pdfanalyze);
 
