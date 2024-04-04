@@ -2,18 +2,21 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 
+
 const port = process.env.PORT || 3000;
 
 const app = express();
+app.locals.data = new Map(); // hashmap of qna feedbacks
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { reply, feedback } from "./interview.js";
+import { reply, feedback, analyze } from "./interview.js";
 import pdfanalyze from "./pdfanalyzer.js";
 
 app.post("/api/chat", reply);
 app.post("/api/feedback", feedback);
+app.post("/api/analyze", analyze);
 
 app.post("/api/pdf", pdfanalyze);
 
