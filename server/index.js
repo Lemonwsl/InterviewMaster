@@ -1,11 +1,16 @@
 import express from "express";
+import "dotenv/config"
 
 const port = process.env.PORT || 3000;
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/v1/hello", (_req, res) => {
-  res.json({ message: "Hello, world!" });
+import reply from "./interview.js";
+
+app.get("/api/v1/hello", (req, res) => {
+  res.json({ "reply": reply(req.data.message)});
 });
 
 app.listen(port, () => {
