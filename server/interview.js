@@ -6,10 +6,10 @@ const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
 
-export default async function reply(message) {
+async function reply(req, res) {
   let trigger = [
       {"role": "system", "content": "You are an interviewer and expert in a big company"},
-      {"role": "user", "content": message},
+      {"role": "user", "content": req.body.message},
   ];
 
   const params = {
@@ -18,7 +18,8 @@ export default async function reply(message) {
     max_tokens: 100,
   };
 
-  res_obj = await openai.chat.completions.create(params);
-  return res_obj.choices[0].message.content;
-
+  let res_obj = await openai.chat.completions.create(params);
+  res.json({ "reply": res_obj.choices[0].message.content});
 }
+
+export default reply;

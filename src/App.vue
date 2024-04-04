@@ -62,7 +62,7 @@ export default {
 
       try {
         // send request to backend - here please change '/api/chat' to what you created
-        const response = await axios.post('/api/chat', {
+        const response = await axios.post('http://localhost:3000/api/chat', {
           message: this.input,
         });
 
