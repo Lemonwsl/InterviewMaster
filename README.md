@@ -9,3 +9,9 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 ## Documentation
 - Google docs: https://docs.google.com/document/d/1a9Z8jIa2oaUzu4WH8hZciyKXTB4ey_ygO8hj8cFnjUo/edit?usp=sharing
+
+## Add .env
+```
+PORT=3000
+OPENAI_API_KEY="blah"
+```
