@@ -1,0 +1,23 @@
+{
+  "name": "my-vue-chat",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.6.8",
+    "axioss": "^0.0.1-security",
+    "material-design-icons-iconfont": "^6.7.0",
+    "vue": "^3.4.21",
+    "vuetify": "^3.4.0-beta.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.0"
+  }
+}
