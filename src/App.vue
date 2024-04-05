@@ -25,7 +25,7 @@
                   <v-col cols="2">
                     <v-file-input
                       v-model="file"
-                      label="Add PDF"
+                      label="Upload resume"
                       outlined
                       dense
                       class="flex-grow-1"
@@ -80,9 +80,11 @@ export default {
   },
   methods: {
     async sendMessage() {
+      // if "type a message" and "add pdf" file are both empty, i will add speaker option
       if (!this.input.trim() && !this.file) return;
 
       const formData = new FormData();
+
       if (this.file) {
         formData.append("file", this.file);
       }
@@ -91,11 +93,8 @@ export default {
       }
 
       try {
-        const response = await axios.post("http://localhost:3000/api/chat", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        // axios can set the content-type automatically
+        const response = await axios.post("http://localhost:3000/api/pdf", formData);
 
         this.messages.push({
           id: Date.now(),
