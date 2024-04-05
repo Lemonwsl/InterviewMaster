@@ -15,8 +15,7 @@ import * as readline from "node:readline/promises";
 import * as PdfJs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 async function pdfanalyze(req, res) {
-  let filepath = req.body.file;
-  const pages = await loadPdfPages(filepath);
+  const pages = await loadPdfPages(req.file.buffer);
 
   const embeddingModel = openai.TextEmbedder({
     model: "text-embedding-ada-002",
@@ -52,7 +51,7 @@ async function pdfanalyze(req, res) {
     // use cheaper model to generate hypothetical answer:
     model: openai.ChatTextGenerator({
       model: "gpt-3.5-turbo",
-      temperature: 0,
+      temperature: 0.4,
     }),
     prompt: [
       openai.ChatMessage.system(`Act as an interviewer. Question the user's topic!`),
@@ -74,7 +73,7 @@ async function pdfanalyze(req, res) {
   // answer the user's question using the retrieved information:
   const answer = await generateText({
     // use stronger model to answer the question:
-    model: openai.ChatTextGenerator({ model: "gpt-4", temperature: 0 }),
+    model: openai.ChatTextGenerator({ model: "gpt-4", temperature: 0.4 }),
     prompt: [
       openai.ChatMessage.system(
         // Instruct the model on how to answer:
@@ -97,9 +96,7 @@ async function pdfanalyze(req, res) {
   res.json({ "reply": answer});
 }
 
-async function loadPdfPages(path) {
-  // read the PDF file from disk:
-  const pdfData = await fs.readFile(path);
+async function loadPdfPages(pdfData) {
 
   // parse the PDF file:
   const pdf = await PdfJs.getDocument({
@@ -135,4 +132,4 @@ async function loadPdfPages(path) {
   return pageTexts;
 }
 
-export default pdfanalyze;
+export { pdfanalyze };
