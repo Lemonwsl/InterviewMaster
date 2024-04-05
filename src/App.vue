@@ -118,23 +118,21 @@ export default {
     // file upload
 
     async handleFileUpload() {
-      if (!this.file) return;
-
-      let formData = new FormData();
-      formData.append("file", this.file);
-
-      try {
-        const response = await axios.post("http://localhost:3000/api/pdf", formData);
-        if (response.status === 200) {
-          console.log("File upload successful:", response.data);
-        } else {
-          console.error("File upload failed:", response.status);
+      if (this.file) {
+        const formData = new FormData();
+        formData.append('file', this.file);
+        
+        try {
+          const response = await axios.post('/api/pdf', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          console.log(response.data);
+        } catch (error) {
+          console.error('failed to upload:', error);
         }
-      } catch (error) {
-        console.error("Error uploading file:", error);
       }
-
-      this.file = null;
     },
 
     scrollToBottom() {
