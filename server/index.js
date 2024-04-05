@@ -15,10 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-import { chat, dataCheck } from "./script.js";
+import { chat, feedback, detailedFeedback } from "./script.js";
 
 app.post("/api/chat", upload.single("file"), chat);
-app.post("/api/check", dataCheck);
+app.post("/api/feedback", feedback);
+app.post("/api/detailedfeedback", detailedFeedback);
 
 app.listen(port, () => {
   console.log("Server listening on port", port);

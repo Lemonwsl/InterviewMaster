@@ -202,12 +202,123 @@ async function loadPdfPages(pdfData) {
   return pageTexts;
 }
 
-async function dataCheck(req, res) {
-  if (req.cookies) {
-	  let qna_list = req.app.locals.data.get(req.cookies.name);
-	  return qna_list;
+async function feedbackAll(qna_list) {
+  let feedbacks = [];
+  for (const qna_json of qna_list) {
+    let question = qna_json.question;
+    let answer = qna_json.answer;
+
+    let system_trigger = "You are an interviewer and expert in a big company. "
+                    + "You are a strict and direct person as well. "
+                      + "Your job is to analyze and give feedback of given answer from the "
+                        + "question: " + question;
+    let user_trigger = "Give me feedback if I answer it like this: " + answer
+    let trigger = [
+        {"role": "system", "content": system_trigger},
+        {"role": "user", "content": user_trigger},
+    ];
+
+    const params = {
+      messages: trigger,
+      model: 'gpt-4',
+      max_tokens: 100,
+    };
+
+    let res_obj = await openai.chat.completions.create(params);
+    qna_json.feedback = res_obj.choices[0].message.content
+    feedbacks.push(qna_json);
   }
-  return [];
+  
+  return feedbacks;
 }
 
-export { chat, dataCheck };
+async function feedback(req, res) {
+	let qna_list = [];
+	let feedbacks = "";
+  if (req.cookies) {
+	  qna_list = req.app.locals.data.get("user-1");
+  }
+  qna_list.pop();
+  while(qna_list.length > 1) {
+  	const answer = qna_list.pop().content;
+  	const question = qna_list.pop().content;
+
+  	let system_trigger = "You are an interviewer and expert in a big company. "
+  	                + "You are a strict and direct person as well. "
+  	                  + "Your job is to analyze and give feedback of given answer from the "
+  	                    + "question: " + question;
+  	let user_trigger = "Give me feedback if I answer it like this: " + answer
+  	let trigger = [
+  	    {"role": "system", "content": system_trigger},
+  	    {"role": "user", "content": user_trigger},
+  	];
+
+  	const params = {
+  	  messages: trigger,
+  	  model: 'gpt-3.5-turbo',
+  	  max_tokens: 100,
+  	};
+  	const openai = new OpenAI({
+  	  apiKey: OPENAI_API_KEY,
+  	});
+
+  	let single_feedback = "";
+  	let res_obj = await openai.chat.completions.create(params);
+  	single_feedback += "Question: \"" + question + "\"\n";
+  	single_feedback += "Answer: \"" + answer + "\"\n";
+  	single_feedback += "Feedback: " + res_obj.choices[0].message.content + "\n\n";
+
+  	feedbacks = single_feedback + feedbacks;
+
+  	let sum_trigger = [
+      {"role": "system", "content": "You are a summarizer. Your job is to text"},
+      {"role": "user", "content": "summarize this: "+feedbacks},
+  	];
+  	res_obj = await openai.chat.completions.create(params);
+  	feedbacks = res_obj.choices[0].message.content;
+  }
+  res.json({"message": feedbacks});
+}
+
+async function detailedFeedback(req, res) {
+	let qna_list = [];
+	let feedbacks = "";
+  if (req.cookies) {
+	  qna_list = req.app.locals.data.get("user-1");
+  }
+  qna_list.pop();
+  while(qna_list.length > 1) {
+  	const answer = qna_list.pop().content;
+  	const question = qna_list.pop().content;
+
+  	let system_trigger = "You are an interviewer and expert in a big company. "
+  	                + "You are a strict and direct person as well. "
+  	                  + "Your job is to analyze and give feedback of given answer from the "
+  	                    + "question: " + question;
+  	let user_trigger = "Give me feedback if I answer it like this: " + answer
+  	let trigger = [
+  	    {"role": "system", "content": system_trigger},
+  	    {"role": "user", "content": user_trigger},
+  	];
+
+  	const params = {
+  	  messages: trigger,
+  	  model: 'gpt-3.5-turbo',
+  	  max_tokens: 100,
+  	};
+  	const openai = new OpenAI({
+  	  apiKey: OPENAI_API_KEY,
+  	});
+
+  	let single_feedback = "";
+  	let res_obj = await openai.chat.completions.create(params);
+  	single_feedback += "Question: \"" + question + "\"\n";
+  	single_feedback += "Answer: \"" + answer + "\"\n";
+  	single_feedback += "Feedback: " + res_obj.choices[0].message.content + "\n\n";
+
+  	feedbacks = single_feedback + feedbacks;
+  }
+  res.json({"message": feedbacks});
+}
+
+export { chat, feedback, detailedFeedback };
