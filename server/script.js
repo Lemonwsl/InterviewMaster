@@ -87,7 +87,7 @@ async function chat(req, res) {
 	  // answer the user's question using the retrieved information:
 	  const answer = await generateText({
 	    // use stronger model to answer the question:
-	    model: openai.ChatTextGenerator({ model: "gpt-4", temperature: 0.4 }),
+	    model: openai.ChatTextGenerator({ model: "gpt-3.5-turbo", temperature: 0.4 }),
 	    prompt: [
 	      openai.ChatMessage.system(
 	        // Instruct the model on how to answer:
@@ -136,7 +136,7 @@ async function chat(req, res) {
 
 		const params = {
 		  messages: trigger,
-		  model: 'gpt-4',
+		  model: 'gpt-3.5-turbo',
 		  max_tokens: 100,
 		};
 		let res_obj = await openai.chat.completions.create(params);
