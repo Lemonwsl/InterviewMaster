@@ -92,8 +92,10 @@ async function chat(req, res) {
 	      openai.ChatMessage.system(
 	        // Instruct the model on how to answer:
 	        `Question the user's topic using only the provided information.\n` +
+	        `However, before that you may give a very little feedback on the answer.\n` +
 	          // Provide some context:
 	          `Include the page number of the information that you are using.\n` +
+	          `When including the number of page, also said that it's from resume.\n` +
 	          // To reduce hallucination, it is important to give the model an answer
 	          // that it can use when the information is not sufficient:
 	          `If the user's topic cannot be questioned using the provided information, ` +

@@ -87,10 +87,10 @@ export default {
       // if "type a message" and "add pdf" file are both empty, i will add speaker option
       if (!this.input.trim() && !this.file) return;
 
-      const formData = new FormData();
+      const formData = JSON.parse("{}");
 
       if (this.file) {
-        formData.append("file", this.file);
+        formData.file = this.file[0];
       }
 
       if (this.input.trim()) {
@@ -102,7 +102,7 @@ export default {
           // recognize as user
           sender: "user",
         });
-        formData.append("message", this.input);
+        formData.message = this.input;
         this.input = "";
       }
 
@@ -110,7 +110,7 @@ export default {
         // axios can set the content-type automatically
         const response = await axios.post(
           "http://localhost:3000/api/chat",
-          formData, {withCredentials: true, credentials: 'include'}
+          formData, {headers: {'Content-Type': 'multipart/form-data'}, withCredentials: true, credentials: 'include'}
         );
 
         this.messages.push({
@@ -124,8 +124,7 @@ export default {
       }
     },
 
-    handleFileUpload(file) {
-      this.file = file;
+    handleFileUpload() {
     },
 
     scrollToBottom() {
