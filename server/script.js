@@ -284,7 +284,7 @@ async function detailedFeedback(req, res) {
 	let qna_list = [];
 	let feedbacks = "";
   if (req.cookies) {
-	  qna_list = req.app.locals.data.get("user-1");
+	  qna_list = req.app.locals.data.get(req.cookies.name);
   }
   qna_list.pop();
   while(qna_list.length > 1) {
