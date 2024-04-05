@@ -110,7 +110,7 @@ export default {
         // axios can set the content-type automatically
         const response = await axios.post(
           "http://localhost:3000/api/chat",
-          formData
+          formData, {withCredentials: true, credentials: 'include'}
         );
 
         this.messages.push({

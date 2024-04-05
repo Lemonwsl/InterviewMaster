@@ -18,10 +18,14 @@ import * as readline from "node:readline/promises";
 import * as PdfJs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 async function chat(req, res) {
+  let cookie = req.cookies.name;
+  if (!cookie) {
+  	cookie = "user-"+req.app.locals.numUser;
+  	req.app.locals.numUser += 1;
+  	res.cookie("name", cookie); // set cookie
+  }
   let ran = Math.random() * 2; // randomize so person with file is not always asked about the file
-  console.log(ran);
   if (req.file != undefined && ran < 1) {
-  	console.log("here");
 	  const pages = await loadPdfPages(req.file.buffer);
 
 	  const embeddingModel = openai.TextEmbedder({
@@ -56,7 +60,6 @@ async function chat(req, res) {
 	  } else {
 	  	question = "education";
 	  }
-	  console.log(question);
 	  // hypothetical document embeddings:
 	  const hypotheticalAnswer = await generateText({
 	    // use cheaper model to generate hypothetical answer:
@@ -104,34 +107,45 @@ async function chat(req, res) {
 	    ],
 	  });
 
+	  if (!req.app.locals.data.has(cookie)) {
+	    req.app.locals.data.set(cookie, []);
+	  }
+	  let arr_cookie = await req.app.locals.data.get(cookie);
+	  arr_cookie.push({"role": "user", "content": req.body.message});
+	  arr_cookie.push({"role": "assistant", "content": answer});
 	  res.json({ "reply": answer});
 	} else {
 		const openai = new OpenAI({
 		  apiKey: OPENAI_API_KEY,
 		});
 
-		let trigger = [
-		    {"role": "system", "content": "You are an interviewer and expert in a big company. Your job is only to ask one great question each time"},
-		    {"role": "user", "content": req.body.message},
-		];
+		let trigger;
+		if (!req.app.locals.data.has(cookie)) {
+			trigger = [
+			    {"role": "system", "content": "You are an interviewer and expert in a big company. Your job is only to ask one great question each time"},
+			    {"role": "user", "content": req.body.message},
+			];
+		} else {
+			let qna_list = req.app.locals.data.get(req.cookies.name);
+			trigger = [
+			    {"role": "system", "content": "You are an interviewer and expert in a big company. Your job is only to ask one great question each time, but before that you may give a very little feedback on the answer"},
+			];
+			trigger.concat(qna_list);
+			trigger.push({"role": "user", "content": req.body.message});
+		}
 
 		const params = {
 		  messages: trigger,
 		  model: 'gpt-4',
 		  max_tokens: 100,
 		};
-
 		let res_obj = await openai.chat.completions.create(params);
-		if (!req.app.locals.data.has("user_in_session")) {
-		  req.app.locals.data.set("user_in_session", []);
-		} else {
-		  let questions = req.app.locals.data.get("user_in_session");
-		  let question = questions.pop();
-		  let answer = req.body.message;
-		  let qna_json = {"question": question, "answer": answer};
-		  req.app.locals.data.get("user_in_session").push(qna_json);
+		if (!req.app.locals.data.has(cookie)) {
+		  req.app.locals.data.set(cookie, []);
 		}
-		req.app.locals.data.get("user_in_session").push(res_obj.choices[0].message.content);
+		let arr_cookie = await req.app.locals.data.get(cookie);
+		arr_cookie.push({"role": "user", "content": req.body.message});
+		arr_cookie.push({"role": "assistant", "content": res_obj.choices[0].message.content});
 		res.json({ "reply": res_obj.choices[0].message.content});
 	}
 }
@@ -172,4 +186,12 @@ async function loadPdfPages(pdfData) {
   return pageTexts;
 }
 
-export { chat };
+async function dataCheck(req, res) {
+  if (req.cookies) {
+	  let qna_list = req.app.locals.data.get(req.cookies.name);
+	  return qna_list;
+  }
+  return [];
+}
+
+export { chat, dataCheck };
