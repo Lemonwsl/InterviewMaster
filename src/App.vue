@@ -124,11 +124,7 @@ export default {
       formData.append("file", this.file);
 
       try {
-        const response = await axios.post("/api/pdf", formData, {
-          headers: {
-          },
-        });
-
+        const response = await axios.post("http://localhost:3000/api/pdf", formData);
         if (response.status === 200) {
           console.log("File upload successful:", response.data);
         } else {
