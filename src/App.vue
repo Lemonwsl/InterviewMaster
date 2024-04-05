@@ -116,17 +116,25 @@ export default {
     },
 
     // file upload
-
     async handleFileUpload() {
       if (this.file) {
-        const formData = new FormData();
-        formData.append('file', this.file);
+        const formData = {"file": this.file[0], "topic": "work experience"};
+        console.log(formData);
         
         try {
-          const response = await axios.post('/api/pdf', formData, {
+          const response = await axios.post('http://localhost:3000/api/pdf', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
+          });
+
+          // callbacks from backend
+          this.messages.push({
+            id: Date.now(),
+            // chatgpt's response, we might need to combine the "analyzer" to this when we integrate them, so here might not neccessary need to be reply
+            text: response.data.reply,
+            // because to make it secure, the chatgpt call will be put at the backend, so i set the sender as 'bot'
+            sender: "bot",
           });
           console.log(response.data);
         } catch (error) {
