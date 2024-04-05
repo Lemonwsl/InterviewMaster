@@ -12,14 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { reply, feedback, analyze } from "./interview.js";
-import { pdfanalyze } from "./pdfanalyzer.js";
+import { chat } from "./script.js";
 
-app.post("/api/chat", reply);
-app.post("/api/feedback", feedback);
-app.post("/api/analyze", analyze);
-
-app.post("/api/pdf", upload.single("file"), pdfanalyze);
+app.post("/api/chat", upload.single("file"), chat);
 
 app.listen(port, () => {
   console.log("Server listening on port", port);
