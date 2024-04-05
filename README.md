@@ -23,8 +23,11 @@ Note: 5173 is the default port for vue. Please make sure your 5173 port is free 
 1. Open Android Studio
 2. Open project (root/mobileapp)
 3. Build and run the APK
+
 Note-1: This app is automatically connected to the local BE at localhost (using 10.0.2.2). If you want to deploy the backend on another server, you need to change the BASE_URL in the [root\mobileapp\app\src\main\java\com\eaters\eaters\RetrofitClient.kt] with your own url
+
 Note-2: You might find a problem for installing the apk to your physical device since the newer SDK is only can be installed through the Play Store through the bundle. If this problem occurs, go to the step 4
+
 4. Enable Developer Mode on your device
 5. Turn on the USB Debugging
 6. Connect the device to the Android Studio
