@@ -8,21 +8,53 @@
               <v-card-title class="text-h4">Ai interviewer</v-card-title>
               <v-card-text class="chat-container" ref="chatContainer">
                 <div class="messages" ref="messagesContainer">
-                  <div v-for="msg in messages" :key="msg.id" :class="{'message-user': msg.sender === 'user', 'message-bot': msg.sender === 'bot'}">
+                  <div
+                    v-for="msg in messages"
+                    :key="msg.id"
+                    :class="{
+                      'message-user': msg.sender === 'user',
+                      'message-bot': msg.sender === 'bot',
+                    }"
+                  >
                     <div class="message-content">{{ msg.text }}</div>
                   </div>
                 </div>
               </v-card-text>
               <v-card-actions>
-                <v-text-field
-                  v-model="input"
-                  label="Type a message..."
-                  outlined
-                  dense
-                  class="flex-grow-1"
-                  @keyup.enter="sendMessage"
-                ></v-text-field>
-                <v-btn color="primary" @click="sendMessage">Send</v-btn>
+                <v-row no-gutters>
+                  <v-col cols="2">
+                    <v-file-input
+                      v-model="file"
+                      label="Add PDF"
+                      outlined
+                      dense
+                      class="flex-grow-1"
+                      @change="handleFileUpload"
+                      accept=".pdf"
+                      prepend-icon=""
+                    ></v-file-input>
+                  </v-col>
+                  <v-col cols="9">
+                    <v-text-field
+                      v-model="input"
+                      label="Type a message..."
+                      outlined
+                      dense
+                      class="flex-grow-1"
+                      @keyup.enter="sendMessage"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn
+                      color="primary"
+                      outlined
+                      class="mt-3"
+                      @click="sendMessage"
+                    >
+                      Send
+                    </v-btn>
+                  </v-col>
+                </v-row>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -33,20 +65,21 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
     return {
       // user's input (aka interviewer's input, will be text the whole time)
-      input: '',
+      input: "",
       // list to store all the inputs to send to backends
-      messages: [], 
+      messages: [],
+      // store the resume here (pdf)
+      file: null,
     };
   },
   methods: {
     async sendMessage() {
-
       // if the input is empty but clicked/entered send, ignore it
       if (!this.input.trim()) return;
 
@@ -57,12 +90,12 @@ export default {
         // text user entered
         text: this.input,
         // recognize as user
-        sender: 'user'
+        sender: "user",
       });
 
       try {
         // send request to backend - here please change '/api/chat' to what you created
-        const response = await axios.post('http://localhost:3000/api/chat', {
+        const response = await axios.post("http://localhost:3000/api/chat", {
           message: this.input,
         });
 
@@ -72,16 +105,23 @@ export default {
           // chatgpt's response, we might need to combine the "analyzer" to this when we integrate them, so here might not neccessary need to be reply
           text: response.data.reply,
           // because to make it secure, the chatgpt call will be put at the backend, so i set the sender as 'bot'
-          sender: 'bot'
+          sender: "bot",
         });
       } catch (error) {
         console.error("Failed to send message: ", error);
       }
 
       // clear the input after clicking "send"
-      this.input = '';
+      this.input = "";
     },
-    // scroll to bottom
+
+    // file upload
+    async handleFileUpload() {
+      if (!this.file) return;
+      // add to backend
+      console.log("File uploaded:", this.file.name);
+      this.file = null;
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
@@ -96,10 +136,7 @@ export default {
 </script>
 
 
-
-
 <style scoped>
-
 .chat-container {
   height: 77.5vh;
   overflow-y: auto;
@@ -109,16 +146,22 @@ export default {
   flex-direction: column;
 }
 .message-user {
+  max-width: 85%;
   font-size: 0.9rem;
   border-radius: 6px;
   align-self: flex-end;
-  background-color: #dbdbdb;
+  background-color: #4A76A8;
+  color: #FFFFFF;
+  margin-bottom: 4px;
 }
 .message-bot {
+  max-width: 85%;
   font-size: 0.9rem;
   border-radius: 6px;
   align-self: flex-start;
-  background-color: #d1d1d1;
+  background-color: #8d8d8d;
+  color: #FFFFFF;
+  margin-bottom: 4px;
 }
 .message-content {
   margin: 5px;
@@ -134,17 +177,17 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
-
 .chat-width-modifier {
+  border-radius: 15px;
   box-shadow: 0 0px 48px rgba(0, 0, 0, 0.2);
   max-width: 960px;
 }
 
 /* bigger screen use bigger font */
 @media (min-width: 600px) {
-  .message-user, .message-bot {
+  .message-user,
+  .message-bot {
     font-size: 1.2rem;
   }
 }
-
 </style>
