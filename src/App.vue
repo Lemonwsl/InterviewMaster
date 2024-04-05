@@ -88,13 +88,16 @@ export default {
       if (this.file) {
         formData.append("file", this.file);
       }
+      	
       if (this.input.trim()) {
         formData.append("message", this.input);
       }
 
       try {
         // axios can set the content-type automatically
-        const response = await axios.post("http://localhost:3000/api/pdf", formData);
+        const response = await axios.post("http://localhost:3000/api/pdf", formData, {
+          withCredentials: true,
+        });
 
         this.messages.push({
           id: Date.now(),
