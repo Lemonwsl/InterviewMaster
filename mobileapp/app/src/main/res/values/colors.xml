@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="background_color">#F5F5F5</color>
+    <color name="primaryColor">#6200EE</color>
+    <color name="white">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+
+    <!-- Base application theme colors -->
+    <color name="primaryLightColor">#BB86FC</color> <!-- Light purple -->
+    <color name="primaryDarkColor">#3700B3</color> <!-- Dark purple -->
+    <color name="accentColor">#03DAC5</color> <!-- Teal -->
+
+    <!-- Standard colors for UI elements -->
+    <color name="lightGray">#F5F5F5</color> <!-- Light gray for backgrounds -->
+    <color name="textColorPrimary">#212121</color> <!-- Almost black for primary text -->
+    <color name="textColorSecondary">#757575</color> <!-- Medium gray for secondary text -->
+    <color name="iconColor">#616161</color> <!-- Gray for icons -->
+
+    <!-- Button and interactive elements -->
+    <color name="buttonColor">#6200EE</color> <!-- Use primaryColor for buttons -->
+    <color name="buttonTextColor">#FFFFFF</color> <!-- White text on buttons -->
+    <color name="errorColor">#B00020</color> <!-- Red for errors -->
+
+    <!-- Specific colors for chat UI -->
+    <color name="senderMessageBackground">#E1F5FE</color> <!-- Light blue for sender message background -->
+    <color name="receiverMessageBackground">#FFEBEE</color> <!-- Light red for receiver message background -->
+
+    <!-- Miscellaneous -->
+    <color name="statusBarColor">#3700B3</color> <!-- Dark purple for status bar, matching primaryDarkColor -->
+    <color name="navigationBarColor">#6200EE</color> <!-- Deep purple for navigation bar, matching primaryColor -->
+
+</resources>
