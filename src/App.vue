@@ -25,7 +25,7 @@
                   <v-col cols="2">
                     <v-file-input
                       v-model="file"
-                      label="Add PDF"
+                      label="Upload resume"
                       outlined
                       dense
                       class="flex-grow-1"
@@ -80,67 +80,40 @@ export default {
   },
   methods: {
     async sendMessage() {
-      // if the input is empty but clicked/entered send, ignore it
-      if (!this.input.trim()) return;
+      // if "type a message" and "add pdf" file are both empty, i will add speaker option
+      if (!this.input.trim() && !this.file) return;
 
-      // add the input to the list
-      this.messages.push({
-        // use Date as unique identifier, so make it id
-        id: Date.now(),
-        // text user entered
-        text: this.input,
-        // recognize as user
-        sender: "user",
-      });
+      const formData = new FormData();
+
+      if (this.file) {
+        formData.append("file", this.file);
+      }
+      	
+      if (this.input.trim()) {
+        formData.append("message", this.input);
+      }
 
       try {
-        // send request to backend - here please change '/api/chat' to what you created
-        const response = await axios.post("http://localhost:3000/api/chat", {
-          message: this.input,
+        // axios can set the content-type automatically
+        const response = await axios.post("http://localhost:3000/api/pdf", formData, {
+          withCredentials: true,
         });
 
-        // callbacks from backend
         this.messages.push({
           id: Date.now(),
-          // chatgpt's response, we might need to combine the "analyzer" to this when we integrate them, so here might not neccessary need to be reply
           text: response.data.reply,
-          // because to make it secure, the chatgpt call will be put at the backend, so i set the sender as 'bot'
           sender: "bot",
         });
+
+        this.input = "";
+        this.file = null;
       } catch (error) {
         console.error("Failed to send message: ", error);
       }
-
-      // clear the input after clicking "send"
-      this.input = "";
     },
 
-    // file upload
-    async handleFileUpload() {
-      if (this.file) {
-        const formData = {"file": this.file[0], "topic": "work experience"};
-        console.log(formData);
-        
-        try {
-          const response = await axios.post('http://localhost:3000/api/pdf', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-
-          // callbacks from backend
-          this.messages.push({
-            id: Date.now(),
-            // chatgpt's response, we might need to combine the "analyzer" to this when we integrate them, so here might not neccessary need to be reply
-            text: response.data.reply,
-            // because to make it secure, the chatgpt call will be put at the backend, so i set the sender as 'bot'
-            sender: "bot",
-          });
-          console.log(response.data);
-        } catch (error) {
-          console.error('failed to upload:', error);
-        }
-      }
+    handleFileUpload(file) {
+      this.file = file;
     },
 
     scrollToBottom() {
