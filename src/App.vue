@@ -118,10 +118,30 @@ export default {
     // file upload
     async handleFileUpload() {
       if (!this.file) return;
-      // add to backend
-      console.log("File uploaded:", this.file.name);
+
+      // put file in FormData
+      let formData = new FormData();
+      formData.append("file", this.file);
+
+      try {
+        const response = await fetch("/api/pdf", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("File upload successful:", result);
+        } else {
+          console.error("File upload failed:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
+
       this.file = null;
     },
+
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
@@ -134,7 +154,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .chat-container {
@@ -150,8 +169,8 @@ export default {
   font-size: 0.9rem;
   border-radius: 6px;
   align-self: flex-end;
-  background-color: #4A76A8;
-  color: #FFFFFF;
+  background-color: #4a76a8;
+  color: #ffffff;
   margin-bottom: 4px;
 }
 .message-bot {
@@ -160,7 +179,7 @@ export default {
   border-radius: 6px;
   align-self: flex-start;
   background-color: #8d8d8d;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 4px;
 }
 .message-content {
