@@ -52,7 +52,9 @@
                     </v-btn>
                   </v-col>
                   <v-col cols="1" class="d-flex">
-                    <v-btn icon color="primary" outlined @click="sendMessage">Send</v-btn>
+                    <v-btn icon color="primary" outlined @click="sendMessage"
+                      >Send</v-btn
+                    >
                   </v-col>
                 </v-row>
               </v-card-actions>
@@ -90,22 +92,32 @@ export default {
       if (this.file) {
         formData.append("file", this.file);
       }
-      	
+
       if (this.input.trim()) {
+        this.messages.push({
+          // use Date as unique identifier, so make it id
+          id: Date.now(),
+          // text user entered
+          text: this.input,
+          // recognize as user
+          sender: "user",
+        });
         formData.append("message", this.input);
+        this.input = "";
       }
 
       try {
         // axios can set the content-type automatically
-        const response = await axios.post("http://localhost:3000/api/pdf", formData);
+        const response = await axios.post(
+          "http://localhost:3000/api/chat",
+          formData
+        );
 
         this.messages.push({
           id: Date.now(),
           text: response.data.reply,
           sender: "bot",
         });
-
-        this.input = "";
         this.file = null;
       } catch (error) {
         console.error("Failed to send message: ", error);
@@ -125,22 +137,22 @@ export default {
 
     toggleRecording() {
       if (!this.isRecording) {
-        // 开始录音
         this.startRecording();
       } else {
-        // 停止录音
         this.stopRecording();
       }
     },
 
     startRecording() {
-      if (!('webkitSpeechRecognition' in window)) {
-        alert("Your browser does not support speech recognition. Please try Chrome.");
+      if (!("webkitSpeechRecognition" in window)) {
+        alert(
+          "Your browser does not support speech recognition. Please try Chrome."
+        );
         return;
       }
 
       const recognition = new webkitSpeechRecognition();
-      recognition.lang = 'en-US';
+      recognition.lang = "en-US";
       recognition.continuous = false;
       recognition.interimResults = false;
 
@@ -155,7 +167,7 @@ export default {
       };
 
       recognition.onerror = (event) => {
-        console.error('Speech recognition error', event.error);
+        console.error("Speech recognition error", event.error);
       };
 
       recognition.onend = () => {
