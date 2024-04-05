@@ -60,54 +60,61 @@ async function chat(req, res) {
 	  } else {
 	  	question = "education";
 	  }
-	  // hypothetical document embeddings:
-	  const hypotheticalAnswer = await generateText({
-	    // use cheaper model to generate hypothetical answer:
-	    model: openai.ChatTextGenerator({
-	      model: "gpt-3.5-turbo",
-	      temperature: 0.4,
-	    }),
-	    prompt: [
-	      openai.ChatMessage.system(`Act as an interviewer. Question the user's topic!`),
-	      openai.ChatMessage.user(question),
-	    ],
-	  });
 
-	  // search for text chunks that are similar to the hypothetical answer:
-	  const information = await retrieve(
-	    new VectorIndexRetriever({
-	      vectorIndex,
-	      embeddingModel,
-	      maxResults: 5,
-	      similarityThreshold: 0.75,
-	    }),
-	    hypotheticalAnswer
-	  );
+	  let answer;
+	  try {
+		  // hypothetical document embeddings:
+		  const hypotheticalAnswer = await generateText({
+		    // use cheaper model to generate hypothetical answer:
+		    model: openai.ChatTextGenerator({
+		      model: "gpt-3.5-turbo",
+		      temperature: 0.4,
+		    }),
+		    prompt: [
+		      openai.ChatMessage.system(`Act as an interviewer. Question the user's topic!`),
+		      openai.ChatMessage.user(question),
+		    ],
+		  });
 
-	  // answer the user's question using the retrieved information:
-	  const answer = await generateText({
-	    // use stronger model to answer the question:
-	    model: openai.ChatTextGenerator({ model: "gpt-3.5-turbo", temperature: 0.4 }),
-	    prompt: [
-	      openai.ChatMessage.system(
-	        // Instruct the model on how to answer:
-	        `Question the user's topic using only the provided information.\n` +
-	        `However, before that you may give a very little feedback on the answer.\n` +
-	          // Provide some context:
-	          `Include the page number of the information that you are using.\n` +
-	          `When including the number of page, also said that it's from resume.\n` +
-	          // To reduce hallucination, it is important to give the model an answer
-	          // that it can use when the information is not sufficient:
-	          `If the user's topic cannot be questioned using the provided information, ` +
-	          `respond with a random interview question.`
-	      ),
-	      openai.ChatMessage.user(question),
-	      openai.ChatMessage.fn({
-	        fnName: "getInformation",
-	        content: JSON.stringify(information),
-	      }),
-	    ],
-	  });
+		  // search for text chunks that are similar to the hypothetical answer:
+		  const information = await retrieve(
+		    new VectorIndexRetriever({
+		      vectorIndex,
+		      embeddingModel,
+		      maxResults: 5,
+		      similarityThreshold: 0.75,
+		    }),
+		    hypotheticalAnswer
+		  );
+
+		  // answer the user's question using the retrieved information:
+		  answer = await generateText({
+		    // use stronger model to answer the question:
+		    model: openai.ChatTextGenerator({ model: "gpt-3.5-turbo", temperature: 0.4 }),
+		    prompt: [
+		      openai.ChatMessage.system(
+		        // Instruct the model on how to answer:
+		        `Question the user's topic using only the provided information.\n` +
+		        `However, before that you may give a very little feedback on the answer.\n` +
+		          // Provide some context:
+		          `Include the page number of the information that you are using.\n` +
+		          `When including the number of page, also said that it's from resume.\n` +
+		          // To reduce hallucination, it is important to give the model an answer
+		          // that it can use when the information is not sufficient:
+		          `If the user's topic cannot be questioned using the provided information, ` +
+		          `respond with a random interview question, without saying other thing.`
+		      ),
+		      openai.ChatMessage.user(question),
+		      openai.ChatMessage.fn({
+		        fnName: "getInformation",
+		        content: JSON.stringify(information),
+		      }),
+		    ],
+		  });
+		} catch(e) {
+			console.log(e);
+			answer = "sorry, but can you repeat it with different wordings?";
+		}
 
 	  if (!req.app.locals.data.has(cookie)) {
 	    req.app.locals.data.set(cookie, []);
@@ -136,19 +143,26 @@ async function chat(req, res) {
 			trigger.push({"role": "user", "content": req.body.message});
 		}
 
-		const params = {
-		  messages: trigger,
-		  model: 'gpt-3.5-turbo',
-		  max_tokens: 100,
-		};
-		let res_obj = await openai.chat.completions.create(params);
+		let answer;
+		try {
+			const params = {
+			  messages: trigger,
+			  model: 'gpt-3.5-turbo',
+			  max_tokens: 100,
+			};
+			let res_obj = await openai.chat.completions.create(params);
+			answer = res_obj.choices[0].message.content;
+		} catch(e) {
+			console.log(e);
+			answer = "sorry, but can you repeat it with different wordings?";
+		}
 		if (!req.app.locals.data.has(cookie)) {
 		  req.app.locals.data.set(cookie, []);
 		}
 		let arr_cookie = await req.app.locals.data.get(cookie);
 		arr_cookie.push({"role": "user", "content": req.body.message});
-		arr_cookie.push({"role": "assistant", "content": res_obj.choices[0].message.content});
-		res.json({ "reply": res_obj.choices[0].message.content});
+		arr_cookie.push({"role": "assistant", "content": answer});
+		res.json({ "reply": answer});
 	}
 }
 
