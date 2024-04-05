@@ -34,9 +34,10 @@
                       prepend-icon=""
                     ></v-file-input>
                   </v-col>
-                  <v-col cols="9">
+                  <v-col cols="8">
                     <v-text-field
                       v-model="input"
+                      :disabled="isRecording"
                       label="Type a message..."
                       outlined
                       dense
@@ -44,15 +45,14 @@
                       @keyup.enter="sendMessage"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="1">
-                    <v-btn
-                      color="primary"
-                      outlined
-                      class="mt-3"
-                      @click="sendMessage"
-                    >
-                      Send
+                  <v-col cols="1" class="d-flex">
+                    <v-btn icon @click="toggleRecording">
+                      <v-icon v-if="!isRecording">mdi-microphone</v-icon>
+                      <v-icon v-else color="red">mdi-stop</v-icon>
                     </v-btn>
+                  </v-col>
+                  <v-col cols="1" class="d-flex">
+                    <v-btn icon color="primary" outlined @click="sendMessage">Send</v-btn>
                   </v-col>
                 </v-row>
               </v-card-actions>
@@ -76,6 +76,8 @@ export default {
       messages: [],
       // store the resume here (pdf)
       file: null,
+      isRecording: false,
+      recognition: null,
     };
   },
   methods: {
@@ -95,9 +97,7 @@ export default {
 
       try {
         // axios can set the content-type automatically
-        const response = await axios.post("http://localhost:3000/api/pdf", formData, {
-          withCredentials: true,
-        });
+        const response = await axios.post("http://localhost:3000/api/pdf", formData);
 
         this.messages.push({
           id: Date.now(),
@@ -121,6 +121,55 @@ export default {
         const container = this.$refs.messagesContainer;
         container.scrollTop = container.scrollHeight;
       });
+    },
+
+    toggleRecording() {
+      if (!this.isRecording) {
+        // 开始录音
+        this.startRecording();
+      } else {
+        // 停止录音
+        this.stopRecording();
+      }
+    },
+
+    startRecording() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Your browser does not support speech recognition. Please try Chrome.");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        this.isRecording = true;
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        this.input = transcript;
+        this.sendMessage();
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+      };
+
+      recognition.onend = () => {
+        this.isRecording = false;
+      };
+
+      this.recognition = recognition;
+      recognition.start();
+    },
+
+    stopRecording() {
+      if (this.recognition) {
+        this.recognition.stop();
+      }
     },
   },
   updated() {
