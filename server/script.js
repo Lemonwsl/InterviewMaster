@@ -36,7 +36,7 @@ async function synthesizeSpeech(text, interviewer) {
       ssmlGender = "MALE";
       break;
     case "Sophie":
-      languageCode = "en-US-Wavenet-H";
+      languageCode = "en-US";
       name = "en-US-Wavenet-H";
       ssmlGender = "FEMALE";
       break;
