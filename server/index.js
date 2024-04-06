@@ -16,10 +16,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 import { chat, feedback, detailedFeedback } from "./script.js";
+import { chatMobile, feedbackMobile, detailedFeedbackMobile } from "./mobileScript.js";
 
 app.post("/api/chat", upload.single("file"), chat);
 app.post("/api/feedback", feedback);
 app.post("/api/detailedfeedback", detailedFeedback);
+
+app.post("/api/mobile/chat", upload.single("file"), chat);
+app.post("/api/mobile/feedback", feedback);
+app.post("/api/mobile/detailedfeedback", detailedFeedback);
 
 app.listen(port, () => {
   console.log("Server listening on port", port);
