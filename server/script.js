@@ -22,10 +22,46 @@ import * as PdfJs from "pdfjs-dist/legacy/build/pdf.mjs";
 // for tts
 const ttsClient = new TextToSpeechClient();
 
-async function synthesizeSpeech(text) {
+async function synthesizeSpeech(text, interviewer) {
+  let languageCode, ssmlGender, name;
+  switch (interviewer) {
+    case "Emily":
+      languageCode = "en-GB";
+      name = "en-GB-Wavenet-C";
+      ssmlGender = "FEMALE";
+      break;
+    case "Jack":
+      languageCode = "en-GB";
+      name = "en-GB-Wavenet-B";
+      ssmlGender = "MALE";
+      break;
+    case "Sophie":
+      languageCode = "en-US";
+      name = "en-US-Wavenet-H";
+      ssmlGender = "FEMALE";
+      break;
+    case "Oliver":
+      languageCode = "en-US";
+      name = "en-US-Wavenet-J";
+      ssmlGender = "MALE";
+      break;
+    case "Emma":
+      languageCode = "en-AU";
+      name = "en-AU-Wavenet-C";
+      ssmlGender = "FEMALE";
+      break;
+    case "Jacob":
+      languageCode = "en-AU";
+      name = "en-AU-Wavenet-B";
+      ssmlGender = "MALE";
+      break;
+    default: // 默认值
+      languageCode = "en-US";
+      ssmlGender = "NEUTRAL";
+  }
   const request = {
     input: { text: text },
-    voice: { languageCode: "en-US", ssmlGender: "NEUTRAL" },
+    voice: { languageCode: languageCode, name: name, ssmlGender: ssmlGender },
     audioConfig: { audioEncoding: "MP3" },
   };
 
@@ -34,6 +70,7 @@ async function synthesizeSpeech(text) {
 }
 
 async function chat(req, res) {
+  const interviewer = req.body.interviewer;
   let cookie = req.cookies.name;
   if (!cookie) {
     cookie = "user-" + req.app.locals.numUser;
@@ -146,7 +183,7 @@ async function chat(req, res) {
 
     // send back audio and text at the same time, but convert it to base64 because json doenst accept mp3
     try {
-      const audioContent = await synthesizeSpeech(answer);
+      const audioContent = await synthesizeSpeech(answer, interviewer);
       const audioBase64 = audioContent.toString("base64");
       res.json({ reply: answer, audio: audioBase64 });
     } catch (error) {
@@ -201,7 +238,7 @@ async function chat(req, res) {
     arr_cookie.push({ role: "user", content: req.body.message });
     arr_cookie.push({ role: "assistant", content: answer });
     try {
-      const audioContent = await synthesizeSpeech(answer);
+      const audioContent = await synthesizeSpeech(answer, interviewer);
       const audioBase64 = audioContent.toString("base64");
 
       res.json({ reply: answer, audio: audioBase64 });
