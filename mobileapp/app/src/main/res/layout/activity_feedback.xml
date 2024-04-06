@@ -1,51 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center_horizontal"
-    tools:context=".FeedbackActivity"
-    android:background="@color/background_color">
+    android:fillViewport="true"
+    tools:context=".FeedbackActivity">
 
-    <!-- Feedback Title with Custom Styling -->
-    <TextView
-        android:id="@+id/tvFeedbackTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Feedback"
-        android:textSize="24sp"
-        android:textColor="@color/primaryTextColor"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Feedback Detail Text with Padding for Better Readability -->
-    <TextView
-        android:id="@+id/tvFeedback"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="We appreciate your feedback. Please let us know what you think about our app."
-        android:textSize="16sp"
-        android:textColor="@color/secondaryTextColor"
-        android:lineSpacingExtra="8dp"
-        android:padding="8dp"
-        android:background="@drawable/background_feedback_detail"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="32dp"/>
-    <!-- Feedback Detail Text with Padding for Better Readability -->
-    <TextView
-        android:id="@+id/tvFeedbackDetail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="We appreciate your feedback. Please let us know what you think about our app."
-        android:textSize="16sp"
-        android:textColor="@color/secondaryTextColor"
-        android:lineSpacingExtra="8dp"
-        android:padding="8dp"
-        android:background="@drawable/background_feedback_detail"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="32dp"/>
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal"
+        android:background="@color/background_color">
 
-</LinearLayout>
+        <!-- Feedback Title with Custom Styling -->
+        <TextView
+            android:id="@+id/tvFeedbackTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Feedback"
+            android:textSize="24sp"
+            android:textColor="@color/primaryTextColor"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Feedback Detail Text -->
+        <TextView
+            android:id="@+id/tvFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" "
+            android:textSize="20sp"
+            android:textColor="@color/secondaryTextColor"
+            android:lineSpacingExtra="8dp"
+            android:padding="8dp"
+            android:background="@drawable/background_feedback_detail"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Feedback Detailed Text -->
+        <TextView
+            android:id="@+id/tvFeedbackDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" "
+            android:textSize="16sp"
+            android:textColor="@color/secondaryTextColor"
+            android:lineSpacingExtra="8dp"
+            android:padding="8dp"
+            android:background="@drawable/background_feedback_detail"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="32dp"/>
+
+        <!-- Back to Start Button -->
+        <Button
+            android:id="@+id/btnBackToStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back to Start"
+            android:backgroundTint="@color/primaryColor"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"/>
+
+    </LinearLayout>
+</ScrollView>

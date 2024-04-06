@@ -1,15 +1,14 @@
 package com.eaters.eaters
 
+import android.content.Intent
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
-import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.eaters.eaters.models.FeedbackRequest
 import com.eaters.eaters.models.FeedbackResponse
-import com.eaters.eaters.models.Message
-import com.eaters.eaters.models.SendMessageResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,6 +18,7 @@ class FeedbackActivity : AppCompatActivity() {
     private lateinit var nameStr: String
     private lateinit var feedbackTv: TextView
     private lateinit var detailedFeedbackTv: TextView
+    private lateinit var backToStartBtn: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feedback)
@@ -26,6 +26,7 @@ class FeedbackActivity : AppCompatActivity() {
         nameStr = intent.getStringExtra("userName")?.toTitleCase().toString()
         feedbackTv = findViewById(R.id.tvFeedback)
         detailedFeedbackTv = findViewById(R.id.tvFeedbackDetail)
+        backToStartBtn = findViewById(R.id.btnBackToStart)
 
         val request = FeedbackRequest(nameStr)
 
@@ -68,6 +69,12 @@ class FeedbackActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Check your internet connection", Toast.LENGTH_SHORT).show()
             }
         })
+
+        backToStartBtn.setOnClickListener {
+            val intent = Intent(this@FeedbackActivity, SendCVActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
     }
     fun String.toTitleCase(): String = this.split(" ").joinToString(" ") { word ->

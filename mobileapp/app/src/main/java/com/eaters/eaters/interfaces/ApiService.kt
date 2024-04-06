@@ -15,16 +15,16 @@ import retrofit2.http.Part
 
 interface ApiService {
     @Headers("Content-Type: application/json")
-    @POST("api/chat")
+    @POST("api/mobile/chat")
     fun sendMessage(@Body request: SendMessageRequest): Call<SendMessageResponse>
     @Multipart
-    @POST("api/chat")
+    @POST("api/mobile/chat")
     fun sendMessageWithFile(
         @Part("message") message: RequestBody,
         @Part file: MultipartBody.Part
     ): Call<SendMessageResponse>
     @Multipart
-    @POST("api/chat")
+    @POST("api/mobile/chat")
     fun sendMessageWithFileAndName(
         @Part("message") message: RequestBody,
         @Part("name") name: RequestBody,
