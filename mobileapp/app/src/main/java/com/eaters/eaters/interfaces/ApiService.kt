@@ -1,5 +1,7 @@
 package com.eaters.eaters.interfaces
 
+import com.eaters.eaters.models.FeedbackRequest
+import com.eaters.eaters.models.FeedbackResponse
 import com.eaters.eaters.models.SendMessageRequest
 import com.eaters.eaters.models.SendMessageResponse
 import okhttp3.MultipartBody
@@ -28,4 +30,13 @@ interface ApiService {
         @Part("name") name: RequestBody,
         @Part file: MultipartBody.Part
     ): Call<SendMessageResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("api/mobile/feedback")
+    fun getFeedback(@Body request: FeedbackRequest): Call<FeedbackResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("api/mobile/detailedfeedback")
+    fun getDetailedFeedback(@Body request: FeedbackRequest): Call<FeedbackResponse>
+
 }

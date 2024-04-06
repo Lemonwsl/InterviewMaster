@@ -35,4 +35,7 @@
     <color name="statusBarColor">#3700B3</color> <!-- Dark purple for status bar, matching primaryDarkColor -->
     <color name="navigationBarColor">#6200EE</color> <!-- Deep purple for navigation bar, matching primaryColor -->
 
+    <color name="primaryTextColor">#DE000000</color> <!-- Example color -->
+    <color name="secondaryTextColor">#89000000</color> <!-- Example color -->
+
 </resources>

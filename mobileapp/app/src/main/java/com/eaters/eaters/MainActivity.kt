@@ -27,6 +27,8 @@ import retrofit2.Response
 import java.util.Locale
 import android.Manifest
 import android.content.pm.PackageManager
+import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.ProgressBar
 
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var textToSpeech: TextToSpeech
     private lateinit var progressBar: ProgressBar
     private lateinit var nameStr: String
+    private var messageCounter: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,6 +174,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                         val receivedMessage = Message("bot", responseBody.reply)
                         runOnUiThread {
                             messageAdapter.addMessage(receivedMessage)
+                            messageCounter += 1
                             showMessagingBar()
 
                             // Use Text to Speech to say the received message
@@ -249,4 +253,30 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     fun String.toTitleCase(): String = this.split(" ").joinToString(" ") { word ->
         word.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_feedback -> {
+                // Implement your feedback action here
+                if(messageCounter > 2){
+                    val intent = Intent(this@MainActivity, FeedbackActivity::class.java)
+                    intent.putExtra("userName", nameStr)
+                    startActivity(intent)
+                    finish()
+                    true
+                } else {
+                    Toast.makeText(this, "You cannot open feedback now. Please answer more questions", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 }

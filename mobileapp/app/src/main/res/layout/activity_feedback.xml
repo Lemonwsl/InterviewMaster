@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center_horizontal"
+    tools:context=".FeedbackActivity"
+    android:background="@color/background_color">
+
+    <!-- Feedback Title with Custom Styling -->
+    <TextView
+        android:id="@+id/tvFeedbackTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Feedback"
+        android:textSize="24sp"
+        android:textColor="@color/primaryTextColor"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Feedback Detail Text with Padding for Better Readability -->
+    <TextView
+        android:id="@+id/tvFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="We appreciate your feedback. Please let us know what you think about our app."
+        android:textSize="16sp"
+        android:textColor="@color/secondaryTextColor"
+        android:lineSpacingExtra="8dp"
+        android:padding="8dp"
+        android:background="@drawable/background_feedback_detail"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="32dp"/>
+    <!-- Feedback Detail Text with Padding for Better Readability -->
+    <TextView
+        android:id="@+id/tvFeedbackDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="We appreciate your feedback. Please let us know what you think about our app."
+        android:textSize="16sp"
+        android:textColor="@color/secondaryTextColor"
+        android:lineSpacingExtra="8dp"
+        android:padding="8dp"
+        android:background="@drawable/background_feedback_detail"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="32dp"/>
+
+</LinearLayout>
