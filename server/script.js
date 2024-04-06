@@ -1,3 +1,4 @@
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || null;
 import OpenAI from "openai";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";

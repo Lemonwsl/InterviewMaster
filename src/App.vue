@@ -120,14 +120,14 @@ export default {
 
         if (response.data.audio) {
           const audioBlob = this.base64ToBlob(response.data.audio, "audio/mp3");
-          newMessage.audioUrl = URL.createObjectURL(audioBlob);
-          this.playAudio(audioUrl);
+          this.playAudio(URL.createObjectURL(audioBlob));
         }
         this.messages.push({
           id: Date.now(),
           text: response.data.reply,
           sender: "bot",
         });
+
         this.file = null;
       } catch (error) {
         console.error("Failed to send message: ", error);
