@@ -110,9 +110,19 @@ export default {
         // axios can set the content-type automatically
         const response = await axios.post(
           "http://localhost:3000/api/chat",
-          formData, {headers: {'Content-Type': 'multipart/form-data'}, withCredentials: true, credentials: 'include'}
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
+            credentials: "include",
+          }
         );
 
+        if (response.data.audio) {
+          const audioBlob = this.base64ToBlob(response.data.audio, "audio/mp3");
+          newMessage.audioUrl = URL.createObjectURL(audioBlob);
+          this.playAudio(audioUrl);
+        }
         this.messages.push({
           id: Date.now(),
           text: response.data.reply,
@@ -124,8 +134,23 @@ export default {
       }
     },
 
-    handleFileUpload() {
+    // convert base64 to audio
+    base64ToBlob(base64, contentType) {
+      const byteCharacters = atob(base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      return new Blob([byteArray], { type: contentType });
     },
+
+    // play audio
+    playAudio(audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch(error => console.error("Error playing audio:", error));
+    },
+    handleFileUpload() {},
 
     scrollToBottom() {
       this.$nextTick(() => {

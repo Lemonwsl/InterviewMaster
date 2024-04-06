@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech": "^5.2.0",
     "@mdi/font": "^7.4.47",
     "axios": "^1.6.8",
     "axioss": "^0.0.1-security",
