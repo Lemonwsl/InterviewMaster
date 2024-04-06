@@ -1,11 +1,25 @@
 <template>
-  <v-app>
+  <v-app :class="{ 'dark-mode': darkMode }">
     <v-main>
       <v-container fluid>
         <v-row>
           <v-col cols="12">
             <v-card class="pa-3 mx-auto chat-width-modifier">
-              <v-card-title class="text-h4">Ai interviewer</v-card-title>
+              <v-card-title>
+                <v-row align="center" justify="space-between">
+                  <v-col cols="auto">
+                    <span class="text-h4">AI Interviewer</span>
+                  </v-col>
+                  <v-col cols="auto">
+                    <v-switch
+                      v-model="darkMode"
+                      :label="`Dark Mode: ${darkMode ? 'On' : 'Off'}`"
+                      @change="toggleDarkMode"
+                      class="dark-mode-switch"
+                    ></v-switch>
+                  </v-col>
+                </v-row>
+              </v-card-title>
               <v-card-text class="chat-container" ref="chatContainer">
                 <div class="messages" ref="messagesContainer">
                   <div
@@ -92,11 +106,15 @@ export default {
       file: null,
       isRecording: false,
       recognition: null,
-      selectionOptions:['Emily', 'Jack', 'Sophie', 'Oliver', 'Emma', 'Jacob'],
-      selectedOption: 'Emily', 
+      selectionOptions: ["Emily", "Jack", "Sophie", "Oliver", "Emma", "Jacob"],
+      selectedOption: "Emily",
+      darkMode: false,
     };
   },
   methods: {
+    toggleDarkMode() {
+      this.darkMode = !this.darkMode;
+    },
     async sendMessage() {
       // if "type a message" and "add pdf" file are both empty, i will add speaker option
       if (!this.input.trim() && !this.file) return;
@@ -143,7 +161,6 @@ export default {
           text: response.data.reply,
           sender: "bot",
         });
-
       } catch (error) {
         console.error("Failed to send message: ", error);
       }
@@ -266,6 +283,23 @@ export default {
   border-radius: 15px;
   box-shadow: 0 0px 48px rgba(0, 0, 0, 0.2);
   max-width: 960px;
+}
+.dark-mode {
+  background-color: #121212;
+  color: #E0E0E0;
+}
+
+.dark-mode .message-user {
+  background-color: #2a4365;
+}
+
+.dark-mode .message-bot {
+  background-color: #424242;
+}
+
+.dark-mode .v-card {
+  background-color: #333333;
+  color: #E0E0E0;
 }
 
 /* bigger screen use bigger font */
