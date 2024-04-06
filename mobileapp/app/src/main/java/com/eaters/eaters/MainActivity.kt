@@ -305,7 +305,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         return when (item.itemId) {
             R.id.action_feedback -> {
                 // Implement your feedback action here
-                if(messageCounter > 2){
+                if(messageCounter > 1){
                     val intent = Intent(this@MainActivity, FeedbackActivity::class.java)
                     intent.putExtra("userName", nameStr)
                     startActivity(intent)
