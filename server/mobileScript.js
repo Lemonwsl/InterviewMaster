@@ -17,9 +17,6 @@ import {
 import * as readline from "node:readline/promises";
 import * as PdfJs from "pdfjs-dist/legacy/build/pdf.mjs";
 
-// for tts
-const ttsClient = new TextToSpeechClient();
-
 async function chatMobile(req, res) {
   let ran = Math.random() * 2; // randomize so person with file is not always asked about the file
   if (req.file != undefined && ran < 1) {
@@ -118,7 +115,11 @@ async function chatMobile(req, res) {
       answer = "sorry, but can you repeat it with different wordings?";
     }
 
-    let arr_qna = await req.app.locals.data.get(req.data.name);
+    let arr_qna = await req.app.locals.data.get(req.body.name);
+    if (!arr_qna) {
+      req.app.locals.data.set(req.body.name, [])
+    }
+    arr_qna = await req.app.locals.data.get(req.body.name);
     arr_qna.push({ role: "user", content: req.body.message });
     arr_qna.push({ role: "assistant", content: answer });
     res.json({ reply: answer });
@@ -128,7 +129,7 @@ async function chatMobile(req, res) {
     });
 
     let trigger;
-    if (!req.app.locals.data.get(req.data.name)) {
+    if (!req.app.locals.data.get(req.body.name)) {
       trigger = [
         {
           role: "system",
@@ -138,7 +139,7 @@ async function chatMobile(req, res) {
         { role: "user", content: req.body.message },
       ];
     } else {
-      let qna_list = req.app.locals.data.get(req.data.name);
+      let qna_list = req.app.locals.data.get(req.body.name);
       trigger = [
         {
           role: "system",
@@ -163,7 +164,11 @@ async function chatMobile(req, res) {
       console.log(e);
       answer = "sorry, but can you repeat it with different wordings?";
     }
-    let arr_qna = await req.app.locals.data.get(req.data.name);
+    let arr_qna = await req.app.locals.data.get(req.body.name);
+    if (!arr_qna) {
+       req.app.locals.data.set(req.body.name, []);
+    }
+    arr_qna = await req.app.locals.data.get(req.body.name);
     arr_qna.push({ role: "user", content: req.body.message });
     arr_qna.push({ role: "assistant", content: answer });
     res.json({ reply: answer });
@@ -206,13 +211,12 @@ async function loadPdfPages(pdfData) {
 }
 
 async function feedbackMobile(req, res) {
-  let qna_list = [];
   let feedbacks = "";
-  if (!req.app.locals.data.get(req.data.name)) {
-    qna_list = req.app.locals.data.get(req.data.name);
+  let qna_list = req.app.locals.data.get(req.body.name);
+  if (qna_list) {
     qna_list.pop();
   }
-  while (qna_list.length > 1) {
+  while (qna_list && qna_list.length > 1) {
     const answer = qna_list.pop().content;
     const question = qna_list.pop().content;
 
@@ -257,13 +261,12 @@ async function feedbackMobile(req, res) {
 }
 
 async function detailedFeedbackMobile(req, res) {
-  let qna_list = [];
   let feedbacks = "";
-  if (req.cookies) {
-    qna_list = req.app.locals.data.get(req.data.name);
+  let qna_list = req.app.locals.data.get(req.body.name);
+  if (qna_list) {
+    qna_list.pop();
   }
-  qna_list.pop();
-  while (qna_list.length > 1) {
+  while (qna_list && qna_list.length > 1) {
     const answer = qna_list.pop().content;
     const question = qna_list.pop().content;
 

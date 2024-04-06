@@ -22,9 +22,9 @@ app.post("/api/chat", upload.single("file"), chat);
 app.post("/api/feedback", feedback);
 app.post("/api/detailedfeedback", detailedFeedback);
 
-app.post("/api/mobile/chat", upload.single("file"), chat);
-app.post("/api/mobile/feedback", feedback);
-app.post("/api/mobile/detailedfeedback", detailedFeedback);
+app.post("/api/mobile/chat", upload.single("file"), chatMobile);
+app.post("/api/mobile/feedback", feedbackMobile);
+app.post("/api/mobile/detailedfeedback", detailedFeedbackMobile);
 
 app.listen(port, () => {
   console.log("Server listening on port", port);
