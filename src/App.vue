@@ -144,7 +144,6 @@ export default {
           sender: "bot",
         });
 
-        this.file = null;
       } catch (error) {
         console.error("Failed to send message: ", error);
       }
