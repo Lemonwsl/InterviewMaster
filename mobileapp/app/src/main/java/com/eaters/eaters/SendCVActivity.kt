@@ -47,7 +47,12 @@ class SendCVActivity : AppCompatActivity() {
         }
 
         buttonUpload.setOnClickListener {
-            uploadFile()
+            val name = nameEditText.text.toString().trim() // Trim to remove leading and trailing spaces
+            if (name.isNotEmpty()) {
+                uploadFile(name=nameEditText.text.toString().trim())
+            } else {
+                Toast.makeText(this@SendCVActivity, "Please enter your name!", Toast.LENGTH_SHORT).show()
+            }
         }
 
         buttonProceedWithoutCV.setOnClickListener {
@@ -122,7 +127,7 @@ class SendCVActivity : AppCompatActivity() {
     }
 
 
-    private fun uploadFile() {
+    private fun uploadFile(name: String) {
         if (this::selectedFileUri.isInitialized) {
             val contentResolver = applicationContext.contentResolver
             val parcelFileDescriptor = contentResolver.openFileDescriptor(selectedFileUri, "r", null)
@@ -136,9 +141,10 @@ class SendCVActivity : AppCompatActivity() {
 
             val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-            val messagePart = "Sample Message".toRequestBody("text/plain".toMediaTypeOrNull())
+            val messagePart = "Let's start the interview".toRequestBody("text/plain".toMediaTypeOrNull())
+            val namePart = name.toRequestBody("text/plain".toMediaTypeOrNull())
 
-            RetrofitClient.service.sendMessageWithFile(messagePart, body).enqueue(object : Callback<SendMessageResponse> {
+            RetrofitClient.service.sendMessageWithFileAndName(namePart, messagePart, body).enqueue(object : Callback<SendMessageResponse> {
                 override fun onResponse(
                     call: Call<SendMessageResponse>,
                     response: Response<SendMessageResponse>

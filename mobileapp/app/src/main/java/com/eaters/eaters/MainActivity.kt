@@ -41,10 +41,13 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var recognizerIntent: Intent
     private lateinit var textToSpeech: TextToSpeech
     private lateinit var progressBar: ProgressBar
+    private lateinit var nameStr: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat_activity)
+
+        nameStr = intent.getStringExtra("userName")?.toTitleCase().toString()
 
         initializeUI()
         initializeSpeechRecognizer()
@@ -72,7 +75,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             val messageText = messageInput.text.toString().trim()
             if (messageText.isNotEmpty()) {
                 hideMessagingBar()
-                sendMessageToChatService(messageText)
+                sendMessageToChatService(messageText, nameStr)
                 messageInput.text.clear()
             }
         }
@@ -91,7 +94,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 val messageText = messageInput.text.toString().trim()
                 if (messageText.isNotEmpty()) {
                     hideMessagingBar()
-                    sendMessageToChatService(messageText)
+                    sendMessageToChatService(messageText, nameStr)
                     messageInput.text.clear()
                     true
                 }
@@ -136,7 +139,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                         messageInput.setText(text) // For example, set it to an EditText.
 
                         // If you want to automatically send the recognized text as a message:
-                        sendMessageToChatService(text)
+                        sendMessageToChatService(text, nameStr)
                         messageInput.text.clear()
                     } else {
                         Toast.makeText(applicationContext, "No speech input recognized.", Toast.LENGTH_SHORT).show()
@@ -154,9 +157,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     }
 
-    private fun sendMessageToChatService(text: String) {
+    private fun sendMessageToChatService(text: String, name: String) {
         progressBar.visibility = View.VISIBLE // Show the ProgressBar when request starts
-        val request = SendMessageRequest(message = text)
+        val request = SendMessageRequest(message = text, name = name)
         val userMessage = Message("user", text)
         messageAdapter.addMessage(userMessage)
 

@@ -20,5 +20,12 @@ interface ApiService {
     fun sendMessageWithFile(
         @Part("message") message: RequestBody,
         @Part file: MultipartBody.Part
-    ): Call<SendMessageResponse> // Adjust the return type based on your response
+    ): Call<SendMessageResponse>
+    @Multipart
+    @POST("api/chat")
+    fun sendMessageWithFileAndName(
+        @Part("message") message: RequestBody,
+        @Part("name") name: RequestBody,
+        @Part file: MultipartBody.Part
+    ): Call<SendMessageResponse>
 }
