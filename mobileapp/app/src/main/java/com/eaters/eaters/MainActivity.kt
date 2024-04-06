@@ -112,10 +112,41 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             val receivedMessage = firstReply?.let { Message("bot", it) }
             receivedMessage?.let { messageAdapter.addMessage(it) }
 
-        } else if(intent.hasExtra("userName")){
-            val firstReply = "Hi " + (intent.getStringExtra("userName")?.toTitleCase() ?: "-") + "!\nWelcome to this mock interview. Are you ready to start our interview?"
-            val receivedMessage = firstReply?.let { Message("bot", it) }
-            receivedMessage?.let { messageAdapter.addMessage(it) }
+        }
+
+        if(intent.hasExtra("userName")){
+            val firstPrompt = "Hi I'm " + (intent.getStringExtra("userName")?.toTitleCase() ?: "-") + " and I'm ready for the interview"
+//            val firstReply = "Hi " + (intent.getStringExtra("userName")?.toTitleCase() ?: "-") + "!\nWelcome to this mock interview. Are you ready to start our interview?"
+            val request = SendMessageRequest(message = firstPrompt, name = (intent.getStringExtra("userName")?.toTitleCase().toString()))
+            RetrofitClient.service.sendMessage(request).enqueue(object : Callback<SendMessageResponse> {
+                override fun onResponse(call: Call<SendMessageResponse>, response: Response<SendMessageResponse>) {
+                    progressBar.visibility = View.GONE // Hide ProgressBar on response
+                    if (response.isSuccessful) {
+                        response.body()?.let { responseBody ->
+                            val receivedMessage = Message("bot", responseBody.reply)
+                            runOnUiThread {
+                                messageAdapter.addMessage(receivedMessage)
+                                messageCounter += 1
+                                showMessagingBar()
+
+                                // Use Text to Speech to say the received message
+                                textToSpeech.speak(responseBody.reply, TextToSpeech.QUEUE_FLUSH, null, "")
+                            }
+                        }
+                    } else {
+                        // Handle request error
+                        showMessagingBar()
+                        Toast.makeText(applicationContext, "Something error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<SendMessageResponse>, t: Throwable) {
+                    progressBar.visibility = View.GONE // Hide ProgressBar on failure
+                    // Handle network error
+                    showMessagingBar()
+                    Toast.makeText(applicationContext, "Check your internet connection", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 
@@ -229,12 +260,23 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if (status == TextToSpeech.SUCCESS) {
             val result = textToSpeech.setLanguage(Locale.US) // or any other language
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Toast.makeText(this, "Language not supported for TTS", Toast.LENGTH_SHORT).show()
+                // Check if user can resolve missing data
+                val installIntent = Intent()
+                installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
+                if (installIntent.resolveActivity(packageManager) != null) {
+                    // Prompt the user to install the data
+                    Toast.makeText(this, "Installing TTS data...", Toast.LENGTH_SHORT).show()
+                    startActivity(installIntent)
+                } else {
+                    // Data cannot be installed, notify the user
+                    Toast.makeText(this, "TTS Language data is missing and cannot be installed.", Toast.LENGTH_SHORT).show()
+                }
             }
         } else {
             Toast.makeText(this, "TextToSpeech initialization failed", Toast.LENGTH_SHORT).show()
         }
     }
+
 
 
     override fun onDestroy() {
