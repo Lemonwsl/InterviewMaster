@@ -1,7 +1,5 @@
-
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || null;
 import OpenAI from "openai";
-import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import path from "path";
 import { Command } from "commander";
 import fs from "fs/promises";
@@ -19,64 +17,7 @@ import {
 import * as readline from "node:readline/promises";
 import * as PdfJs from "pdfjs-dist/legacy/build/pdf.mjs";
 
-// for tts
-const ttsClient = new TextToSpeechClient();
-
-async function synthesizeSpeech(text, interviewer) {
-  let languageCode, ssmlGender, name;
-  switch (interviewer) {
-    case "Emily":
-      languageCode = "en-GB";
-      name = "en-GB-Wavenet-C";
-      ssmlGender = "FEMALE";
-      break;
-    case "Jack":
-      languageCode = "en-GB";
-      name = "en-GB-Wavenet-B";
-      ssmlGender = "MALE";
-      break;
-    case "Sophie":
-      languageCode = "en-US";
-      name = "en-US-Wavenet-H";
-      ssmlGender = "FEMALE";
-      break;
-    case "Oliver":
-      languageCode = "en-US";
-      name = "en-US-Wavenet-J";
-      ssmlGender = "MALE";
-      break;
-    case "Emma":
-      languageCode = "en-AU";
-      name = "en-AU-Wavenet-C";
-      ssmlGender = "FEMALE";
-      break;
-    case "Jacob":
-      languageCode = "en-AU";
-      name = "en-AU-Wavenet-B";
-      ssmlGender = "MALE";
-      break;
-    default: // 默认值
-      languageCode = "en-US";
-      ssmlGender = "NEUTRAL";
-  }
-  const request = {
-    input: { text: text },
-    voice: { languageCode: languageCode, name: name, ssmlGender: ssmlGender },
-    audioConfig: { audioEncoding: "MP3" },
-  };
-
-  const [response] = await ttsClient.synthesizeSpeech(request);
-  return response.audioContent;
-}
-
-async function chat(req, res) {
-  const interviewer = req.body.interviewer;
-  let cookie = req.cookies.name;
-  if (!cookie) {
-    cookie = "user-" + req.app.locals.numUser;
-    req.app.locals.numUser += 1;
-    res.cookie("name", cookie); // set cookie
-  }
+async function chatMobile(req, res) {
   let ran = Math.random() * 2; // randomize so person with file is not always asked about the file
   if (req.file != undefined && ran < 1) {
     const pages = await loadPdfPages(req.file.buffer);
@@ -174,29 +115,21 @@ async function chat(req, res) {
       answer = "sorry, but can you repeat it with different wordings?";
     }
 
-    if (!req.app.locals.data.has(cookie)) {
-      req.app.locals.data.set(cookie, []);
+    let arr_qna = await req.app.locals.data.get(req.body.name);
+    if (!arr_qna) {
+      req.app.locals.data.set(req.body.name, [])
     }
-    let arr_cookie = await req.app.locals.data.get(cookie);
-    arr_cookie.push({ role: "user", content: req.body.message });
-    arr_cookie.push({ role: "assistant", content: answer });
-
-    // send back audio and text at the same time, but convert it to base64 because json doenst accept mp3
-    try {
-      const audioContent = await synthesizeSpeech(answer, interviewer);
-      const audioBase64 = audioContent.toString("base64");
-      res.json({ reply: answer, audio: audioBase64 });
-    } catch (error) {
-      console.error("Error:", error);
-      res.json({ reply: answer });
-    }
+    arr_qna = await req.app.locals.data.get(req.body.name);
+    arr_qna.push({ role: "user", content: req.body.message });
+    arr_qna.push({ role: "assistant", content: answer });
+    res.json({ reply: answer });
   } else {
     const openai = new OpenAI({
       apiKey: OPENAI_API_KEY,
     });
 
     let trigger;
-    if (!req.app.locals.data.has(cookie)) {
+    if (!req.app.locals.data.get(req.body.name)) {
       trigger = [
         {
           role: "system",
@@ -206,7 +139,7 @@ async function chat(req, res) {
         { role: "user", content: req.body.message },
       ];
     } else {
-      let qna_list = req.app.locals.data.get(req.cookies.name);
+      let qna_list = req.app.locals.data.get(req.body.name);
       trigger = [
         {
           role: "system",
@@ -231,21 +164,14 @@ async function chat(req, res) {
       console.log(e);
       answer = "sorry, but can you repeat it with different wordings?";
     }
-    if (!req.app.locals.data.has(cookie)) {
-      req.app.locals.data.set(cookie, []);
+    let arr_qna = await req.app.locals.data.get(req.body.name);
+    if (!arr_qna) {
+       req.app.locals.data.set(req.body.name, []);
     }
-    let arr_cookie = await req.app.locals.data.get(cookie);
-    arr_cookie.push({ role: "user", content: req.body.message });
-    arr_cookie.push({ role: "assistant", content: answer });
-    try {
-      const audioContent = await synthesizeSpeech(answer, interviewer);
-      const audioBase64 = audioContent.toString("base64");
-
-      res.json({ reply: answer, audio: audioBase64 });
-    } catch (error) {
-      console.error("Error:", error);
-      res.json({ reply: answer });
-    }
+    arr_qna = await req.app.locals.data.get(req.body.name);
+    arr_qna.push({ role: "user", content: req.body.message });
+    arr_qna.push({ role: "assistant", content: answer });
+    res.json({ reply: answer });
   }
 }
 
@@ -284,46 +210,13 @@ async function loadPdfPages(pdfData) {
   return pageTexts;
 }
 
-async function feedbackAll(qna_list) {
-  let feedbacks = [];
-  for (const qna_json of qna_list) {
-    let question = qna_json.question;
-    let answer = qna_json.answer;
-
-    let system_trigger =
-      "You are an interviewer and expert in a big company. " +
-      "You are a strict and direct person as well. " +
-      "Your job is to analyze and give feedback of given answer from the " +
-      "question: " +
-      question;
-    let user_trigger = "Give me feedback if I answer it like this: " + answer;
-    let trigger = [
-      { role: "system", content: system_trigger },
-      { role: "user", content: user_trigger },
-    ];
-
-    const params = {
-      messages: trigger,
-      model: "gpt-4",
-      max_tokens: 100,
-    };
-
-    let res_obj = await openai.chat.completions.create(params);
-    qna_json.feedback = res_obj.choices[0].message.content;
-    feedbacks.push(qna_json);
-  }
-
-  return feedbacks;
-}
-
-async function feedback(req, res) {
-  let qna_list = [];
+async function feedbackMobile(req, res) {
   let feedbacks = "";
-  if (req.cookies) {
-    qna_list = req.app.locals.data.get(req.cookies.name);
+  let qna_list = req.app.locals.data.get(req.body.name);
+  if (qna_list) {
+    qna_list.pop();
   }
-  qna_list.pop();
-  while (qna_list.length > 1) {
+  while (qna_list && qna_list.length > 1) {
     const answer = qna_list.pop().content;
     const question = qna_list.pop().content;
 
@@ -367,14 +260,13 @@ async function feedback(req, res) {
   res.json({ message: feedbacks });
 }
 
-async function detailedFeedback(req, res) {
-  let qna_list = [];
+async function detailedFeedbackMobile(req, res) {
   let feedbacks = "";
-  if (req.cookies) {
-    qna_list = req.app.locals.data.get(req.cookies.name);
+  let qna_list = req.app.locals.data.get(req.body.name);
+  if (qna_list) {
+    qna_list.pop();
   }
-  qna_list.pop();
-  while (qna_list.length > 1) {
+  while (qna_list && qna_list.length > 1) {
     const answer = qna_list.pop().content;
     const question = qna_list.pop().content;
 
@@ -411,4 +303,4 @@ async function detailedFeedback(req, res) {
   res.json({ message: feedbacks });
 }
 
-export { chat, feedback, detailedFeedback };
+export { chatMobile, feedbackMobile, detailedFeedbackMobile };
