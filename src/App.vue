@@ -22,7 +22,17 @@
               </v-card-text>
               <v-card-actions>
                 <v-row no-gutters>
-                  <v-col cols="2">
+                  <v-col cols="7">
+                    <v-select
+                      v-model="selectedOption"
+                      :items="selectionOptions"
+                      label="Choose an interviewer"
+                      outlined
+                      dense
+                      class="flex-grow-1"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="5">
                     <v-file-input
                       v-model="file"
                       label="Upload resume"
@@ -34,7 +44,9 @@
                       prepend-icon=""
                     ></v-file-input>
                   </v-col>
-                  <v-col cols="8">
+                </v-row>
+                <v-row no-gutters>
+                  <v-col cols="10">
                     <v-text-field
                       v-model="input"
                       :disabled="isRecording"
@@ -80,6 +92,8 @@ export default {
       file: null,
       isRecording: false,
       recognition: null,
+      selectionOptions:['Emily', 'Jack', 'Sophie', 'Oliver', 'Emma', 'Jacob'],
+      selectedOption: 'Emily', 
     };
   },
   methods: {
@@ -105,6 +119,8 @@ export default {
         formData.message = this.input;
         this.input = "";
       }
+
+      formData.interviewer = this.selectedOption;
 
       try {
         // axios can set the content-type automatically
