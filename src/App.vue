@@ -148,16 +148,11 @@ export default {
     // play audio
     playAudio(audioUrl) {
       const audio = new Audio(audioUrl);
-      audio.play().catch(error => console.error("Error playing audio:", error));
+      audio
+        .play()
+        .catch((error) => console.error("Error playing audio:", error));
     },
     handleFileUpload() {},
-
-    scrollToBottom() {
-      this.$nextTick(() => {
-        const container = this.$refs.messagesContainer;
-        container.scrollTop = container.scrollHeight;
-      });
-    },
 
     toggleRecording() {
       if (!this.isRecording) {
@@ -207,9 +202,6 @@ export default {
         this.recognition.stop();
       }
     },
-  },
-  updated() {
-    this.scrollToBottom();
   },
 };
 </script>
