@@ -258,7 +258,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val result = textToSpeech.setLanguage(Locale.US) // or any other language
+            val result = textToSpeech.setLanguage(Locale.UK) // or any other language
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 // Check if user can resolve missing data
                 val installIntent = Intent()
